@@ -32,7 +32,7 @@ namespace CSAnalyzer.Analyzer
             foreach (var methodDeclaration in methodDeclarations)
             {
                 string methodName = methodDeclaration.Identifier.Text;
-                Console.WriteLine($"Analyzing references for method '{methodName}':\n");
+                Console.WriteLine($"\n\nAnalyzing references for method '{methodName}':\n");
 
                 // Adicionar o método como nó
                 _dgmlExporter.AddNode(methodName);

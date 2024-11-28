@@ -60,16 +60,21 @@ namespace CSAnalyzer
                 // Do analysis on the projects in the loaded solution
                 foreach (var project in solution.Projects)
                 {
+                    var compilation = await project.GetCompilationAsync();
+
                     foreach (var document in project.Documents)
                     {
                         if (filter.Contains(document.Name)) continue;
 
-                        var code = await document.GetTextAsync();
-                        var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                        // var code = await document.GetTextAsync();
+                        // var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                        var syntaxTree = await document.GetSyntaxTreeAsync();
 
+                        /*
                         var compilation = CSharpCompilation.Create("Analysis")
                             .AddReferences(MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
                             .AddSyntaxTrees(syntaxTree);
+                        */
 
                         var semanticModel = compilation.GetSemanticModel(syntaxTree);
                         var analyzer = new MethodReferenceAnalyzer(semanticModel, dgmlExporter);
@@ -80,7 +85,7 @@ namespace CSAnalyzer
 
                 // Exportar para DGML
                 dgmlExporter.Export("method_graph.dgml");
-                Console.WriteLine("DGML file exported: method_graph.dgml");
+                Console.WriteLine("\n\nDGML file exported: method_graph.dgml");
             }
         }
 
