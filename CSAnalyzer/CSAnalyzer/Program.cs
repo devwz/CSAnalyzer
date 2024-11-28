@@ -61,7 +61,7 @@ namespace CSAnalyzer
                         var semanticModel = compilation.GetSemanticModel(syntaxTree);
                         var analyzer = new MethodReferenceAnalyzer(semanticModel);
 
-                        analyzer.Analyze(syntaxTree, "Run");
+                        analyzer.Analyze(syntaxTree);
                     }
                 }
             }

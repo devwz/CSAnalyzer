@@ -3,6 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,34 +21,31 @@ namespace CSAnalyzer.Analyzer
         /// <summary>
         /// Analisar referências de um método específico.
         /// </summary>
-        public void Analyze(SyntaxTree syntaxTree, string methodName)
+        public void Analyze(SyntaxTree syntaxTree)
         {
             var root = syntaxTree.GetRoot();
 
             var methodDeclarations = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
 
-            var targetMethod = methodDeclarations.FirstOrDefault(m => m.Identifier.Text == methodName);
-            if (targetMethod == null)
+            foreach (var methodDeclaration in methodDeclarations)
             {
-                Console.WriteLine($"Method '{methodName}' not found.");
-                return;
+                string methodName = methodDeclaration.Identifier.Text;
+                Console.WriteLine($"Analyzing references for method '{methodName}':\n");
+
+                // Identificar quem o método chama
+                Console.WriteLine("Methods called by this method:");
+                AnalyzeMethodCalls(methodDeclaration, methodName);
+
+                // Identificar quem chama o método
+                Console.WriteLine("\nMethods that call this method:");
+                AnalyzeMethodUsages(root, methodName);
             }
-
-            Console.WriteLine($"Analyzing references for method '{methodName}':\n");
-
-            // Identificar quem o método chama
-            Console.WriteLine("Methods called by this method:");
-            AnalyzeMethodCalls(targetMethod);
-
-            // Identificar quem chama o método
-            Console.WriteLine("\nMethods that call this method:");
-            AnalyzeMethodUsages(root, methodName);
         }
 
         /// <summary>
         /// Identifica métodos que são chamados pelo método atual.
         /// </summary>
-        private void AnalyzeMethodCalls(MethodDeclarationSyntax method)
+        private void AnalyzeMethodCalls(MethodDeclarationSyntax method, string methodName)
         {
             var methodCalls = method.DescendantNodes().OfType<InvocationExpressionSyntax>();
 
@@ -58,7 +56,10 @@ namespace CSAnalyzer.Analyzer
 
                 if (methodSymbol != null)
                 {
-                    Console.WriteLine($"- {methodSymbol.ContainingType.Name}.{methodSymbol.Name}()");
+                    // var calledMethod = $"{methodSymbol.ContainingType.Name}.{methodSymbol.Name}";
+                    var calledMethod = $"{methodSymbol.Name}";
+
+                    Console.WriteLine($"- {calledMethod}()");
                 }
             }
         }
