@@ -39,6 +39,7 @@ namespace CSAnalyzer
                 // Print message for WorkspaceFailed event to help diagnosing project load failures.
                 workspace.WorkspaceFailed += (o, e) => Console.WriteLine(e.Diagnostic.Message);
 
+                // ToDo: Verificar quando é .sln, quando é .csproj e quando é .cs
                 var solutionPath = args[0];
                 Console.WriteLine($"Loading solution '{solutionPath}'");
 
@@ -48,11 +49,21 @@ namespace CSAnalyzer
 
                 var dgmlExporter = new DgmlExporter();
 
+                // ToDo: Obter lista de um arquivo externo
+                var filter = new List<string>()
+                {
+                    "App2.GlobalUsings.g.cs",
+                    ".NETCoreApp,Version=v6.0.AssemblyAttributes.cs",
+                    "App2.AssemblyInfo.cs"
+                };
+
                 // Do analysis on the projects in the loaded solution
                 foreach (var project in solution.Projects)
                 {
                     foreach (var document in project.Documents)
                     {
+                        if (filter.Contains(document.Name)) continue;
+
                         var code = await document.GetTextAsync();
                         var syntaxTree = CSharpSyntaxTree.ParseText(code);
 
