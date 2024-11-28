@@ -64,11 +64,23 @@ namespace CSAnalyzer.Analyzer
                     // var calledMethod = $"{methodSymbol.ContainingType.Name}.{methodSymbol.Name}";
                     var calledMethod = $"{methodSymbol.Name}";
 
-                    Console.WriteLine($"- {calledMethod}()");
+                    // Verifica se calledMethod pertence a uma lib nativa do C#
+                    // ToDo: refatorar
+                    var namespaceName = methodSymbol.ContainingNamespace.ToDisplayString();
+                    var assemblyName = methodSymbol.ContainingAssembly.Name;
 
-                    // Adicionar nó e aresta no grafo
-                    _dgmlExporter.AddNode(calledMethod);
-                    _dgmlExporter.AddEdge(callerMethod, calledMethod);
+                    var isNativeLibrary = assemblyName == "mscorlib" ||
+                          assemblyName == "System.Private.CoreLib" ||
+                          assemblyName.StartsWith("System");
+
+                    if (!isNativeLibrary)
+                    {
+                        Console.WriteLine($"- {calledMethod}()");
+
+                        // Adicionar nó e aresta no grafo
+                        _dgmlExporter.AddNode(calledMethod);
+                        _dgmlExporter.AddEdge(callerMethod, calledMethod);
+                    }
                 }
             }
         }

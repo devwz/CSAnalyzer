@@ -52,9 +52,9 @@ namespace CSAnalyzer
                 // ToDo: Obter lista de um arquivo externo
                 var filter = new List<string>()
                 {
-                    "App2.GlobalUsings.g.cs",
+                    "App3.GlobalUsings.g.cs",
                     ".NETCoreApp,Version=v6.0.AssemblyAttributes.cs",
-                    "App2.AssemblyInfo.cs"
+                    "App3.AssemblyInfo.cs"
                 };
 
                 // Do analysis on the projects in the loaded solution
