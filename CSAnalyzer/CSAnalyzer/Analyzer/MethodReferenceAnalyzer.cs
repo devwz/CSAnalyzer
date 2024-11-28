@@ -12,10 +12,12 @@ namespace CSAnalyzer.Analyzer
     public class MethodReferenceAnalyzer
     {
         private readonly SemanticModel _semanticModel;
+        private readonly DgmlExporter _dgmlExporter;
 
-        public MethodReferenceAnalyzer(SemanticModel semanticModel)
+        public MethodReferenceAnalyzer(SemanticModel semanticModel, DgmlExporter dgmlExporter)
         {
             _semanticModel = semanticModel;
+            _dgmlExporter = dgmlExporter;
         }
 
         /// <summary>
@@ -32,6 +34,9 @@ namespace CSAnalyzer.Analyzer
                 string methodName = methodDeclaration.Identifier.Text;
                 Console.WriteLine($"Analyzing references for method '{methodName}':\n");
 
+                // Adicionar o método como nó
+                _dgmlExporter.AddNode(methodName);
+
                 // Identificar quem o método chama
                 Console.WriteLine("Methods called by this method:");
                 AnalyzeMethodCalls(methodDeclaration, methodName);
@@ -45,7 +50,7 @@ namespace CSAnalyzer.Analyzer
         /// <summary>
         /// Identifica métodos que são chamados pelo método atual.
         /// </summary>
-        private void AnalyzeMethodCalls(MethodDeclarationSyntax method, string methodName)
+        private void AnalyzeMethodCalls(MethodDeclarationSyntax method, string callerMethod)
         {
             var methodCalls = method.DescendantNodes().OfType<InvocationExpressionSyntax>();
 
@@ -60,6 +65,10 @@ namespace CSAnalyzer.Analyzer
                     var calledMethod = $"{methodSymbol.Name}";
 
                     Console.WriteLine($"- {calledMethod}()");
+
+                    // Adicionar nó e aresta no grafo
+                    _dgmlExporter.AddNode(calledMethod);
+                    _dgmlExporter.AddEdge(callerMethod, calledMethod);
                 }
             }
         }

@@ -46,6 +46,8 @@ namespace CSAnalyzer
                 var solution = await workspace.OpenSolutionAsync(solutionPath, new ConsoleProgressReporter());
                 Console.WriteLine($"Finished loading solution '{solutionPath}'");
 
+                var dgmlExporter = new DgmlExporter();
+
                 // Do analysis on the projects in the loaded solution
                 foreach (var project in solution.Projects)
                 {
@@ -59,11 +61,15 @@ namespace CSAnalyzer
                             .AddSyntaxTrees(syntaxTree);
 
                         var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                        var analyzer = new MethodReferenceAnalyzer(semanticModel);
+                        var analyzer = new MethodReferenceAnalyzer(semanticModel, dgmlExporter);
 
                         analyzer.Analyze(syntaxTree);
                     }
                 }
+
+                // Exportar para DGML
+                dgmlExporter.Export("method_graph.dgml");
+                Console.WriteLine("DGML file exported: method_graph.dgml");
             }
         }
 
