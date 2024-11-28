@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CSAnalyzer.Analyzer;
 using Microsoft.Build.Locator;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -45,7 +46,24 @@ namespace CSAnalyzer
                 var solution = await workspace.OpenSolutionAsync(solutionPath, new ConsoleProgressReporter());
                 Console.WriteLine($"Finished loading solution '{solutionPath}'");
 
-                // TODO: Do analysis on the projects in the loaded solution
+                // Do analysis on the projects in the loaded solution
+                foreach (var project in solution.Projects)
+                {
+                    foreach (var document in project.Documents)
+                    {
+                        var code = await document.GetTextAsync();
+                        var syntaxTree = CSharpSyntaxTree.ParseText(code);
+
+                        var compilation = CSharpCompilation.Create("Analysis")
+                            .AddReferences(MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
+                            .AddSyntaxTrees(syntaxTree);
+
+                        var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                        var analyzer = new MethodReferenceAnalyzer(semanticModel);
+
+                        analyzer.Analyze(syntaxTree, "Run");
+                    }
+                }
             }
         }
 
