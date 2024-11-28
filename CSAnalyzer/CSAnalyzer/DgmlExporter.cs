@@ -39,7 +39,7 @@ namespace CSAnalyzer
             // Gera o grafo DGML
             var xDoc = new XDocument(
                 new XElement("DirectedGraph",
-                    new XAttribute(XNamespace.Xmlns + "dgml", "http://schemas.microsoft.com/vs/2009/dgml"),
+                    new XAttribute(XNamespace.Xmlns + "dgml", "http://schemas.microsoft.com/vs/2009/dgml"), // ToDo: Corrigir erro dgml
                     new XElement("Nodes",
                         _nodes.Select(node => new XElement("Node", new XAttribute("Id", node)))
                     ),

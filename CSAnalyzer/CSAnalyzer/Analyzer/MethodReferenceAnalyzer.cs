@@ -31,7 +31,10 @@ namespace CSAnalyzer.Analyzer
 
             foreach (var methodDeclaration in methodDeclarations)
             {
-                string methodName = methodDeclaration.Identifier.Text;
+                // string methodName = methodDeclaration.Identifier.Text;
+                var methodSymbol = (IMethodSymbol)_semanticModel.GetDeclaredSymbol(methodDeclaration);
+                string methodName = $"{methodSymbol.ContainingType.Name}.{methodSymbol.Name}";
+
                 Console.WriteLine($"\n\nAnalyzing references for method '{methodName}':\n");
 
                 // Adicionar o método como nó
@@ -61,8 +64,8 @@ namespace CSAnalyzer.Analyzer
 
                 if (methodSymbol != null)
                 {
-                    // var calledMethod = $"{methodSymbol.ContainingType.Name}.{methodSymbol.Name}";
-                    var calledMethod = $"{methodSymbol.Name}";
+                    var calledMethod = $"{methodSymbol.ContainingType.Name}.{methodSymbol.Name}";
+                    // var calledMethod = $"{methodSymbol.Name}";
 
                     // Verifica se calledMethod pertence a uma lib nativa do C#
                     // ToDo: refatorar
@@ -71,7 +74,8 @@ namespace CSAnalyzer.Analyzer
 
                     var isNativeLibrary = assemblyName == "mscorlib" ||
                           assemblyName == "System.Private.CoreLib" ||
-                          assemblyName.StartsWith("System");
+                          assemblyName.StartsWith("System") ||
+                          assemblyName.StartsWith("Microsoft");
 
                     if (!isNativeLibrary)
                     {
