@@ -33,7 +33,7 @@ namespace CSAnalyzer.Analyzer
             {
                 // string methodName = methodDeclaration.Identifier.Text;
                 var methodSymbol = (IMethodSymbol)_semanticModel.GetDeclaredSymbol(methodDeclaration);
-                string methodName = $"{methodSymbol.ContainingType.Name}.{methodSymbol.Name}";
+                string methodName = $"{methodSymbol.ContainingType}.{methodSymbol.Name}";
 
                 Console.WriteLine($"\n\nAnalyzing references for method '{methodName}':\n");
 
@@ -64,7 +64,7 @@ namespace CSAnalyzer.Analyzer
 
                 if (methodSymbol != null)
                 {
-                    var calledMethod = $"{methodSymbol.ContainingType.Name}.{methodSymbol.Name}";
+                    var calledMethod = $"{methodSymbol.ContainingType}.{methodSymbol.Name}";
                     // var calledMethod = $"{methodSymbol.Name}";
 
                     // Verifica se calledMethod pertence a uma lib nativa do C#
