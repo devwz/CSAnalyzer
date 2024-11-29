@@ -4,16 +4,25 @@ namespace App6
 {
     public class App
     {
-        ApplicationDbContext _context;
+        private readonly IProductService _productService;
 
-        public App(ApplicationDbContext context)
+        public App(IProductService productService)
         {
-            _context = context;
+            _productService = productService;
         }
 
         public void Run()
         {
-            _ = _context.Product.ToList();
+            Product product = new()
+            {
+                Title = "Product 1",
+                Price = 10
+            };
+
+            _productService.Add(product);
+
+            Product product1 = _productService.Find(product.Id) ?? throw new NotImplementedException();
+            _productService.Delete(product1.Id);
         }
     }
 }

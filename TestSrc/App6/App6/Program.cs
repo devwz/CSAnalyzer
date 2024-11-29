@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using App6.Infra;
+using App6.Infra.Data;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace App6
@@ -9,11 +10,10 @@ namespace App6
         {
             var services = new ServiceCollection();
 
-            services.AddDbContext<ApplicationDbContext>(options =>
-            {
-                const string connectionString = @"Server=(LocalDb)\MSSqlLocalDb;Initial Catalog=App6-code-first;Integrated Security=True";
-                options.UseSqlServer(connectionString);
-            });
+            services.AddSingleton(
+                new ApplicationDbContext("Server=(LocalDb)\\MSSqlLocalDb;Initial Catalog=App6;Integrated Security=True"));
+
+            services.AddScoped<IProductService, ProductService>();
 
             services.AddSingleton<App>();
 

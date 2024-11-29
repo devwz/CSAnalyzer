@@ -1,16 +1,15 @@
-﻿using App6.Infra.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using System.Data.SqlClient;
 
 namespace App6.Infra
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
+        public ApplicationDbContext(string strCon)
         {
-            Database.EnsureCreated();
+            SqlConnection = new SqlConnection(strCon);
+            SqlConnection.Open();
         }
 
-        public DbSet<Product> Product { get; set; }
+        public SqlConnection SqlConnection { get; set; }
     }
 }
