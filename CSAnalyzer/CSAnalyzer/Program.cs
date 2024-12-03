@@ -48,13 +48,14 @@ namespace CSAnalyzer
                 Console.WriteLine($"Finished loading solution '{solutionPath}'");
 
                 var dgmlExporter = new DgmlExporter();
+                List<string> nodeList = new List<string>();
 
                 // ToDo: Obter lista de um arquivo externo
                 var filter = new List<string>()
                 {
-                    "App3.GlobalUsings.g.cs",
+                    "App6.GlobalUsings.g.cs",
                     ".NETCoreApp,Version=v6.0.AssemblyAttributes.cs",
-                    "App3.AssemblyInfo.cs"
+                    "App6.AssemblyInfo.cs"
                 };
 
                 // Do analysis on the projects in the loaded solution
@@ -79,9 +80,22 @@ namespace CSAnalyzer
                         var semanticModel = compilation.GetSemanticModel(syntaxTree);
                         var analyzer = new MethodReferenceAnalyzer(semanticModel, dgmlExporter);
 
-                        analyzer.Analyze(syntaxTree);
+                        analyzer.Analyze(syntaxTree, nodeList);
                     }
                 }
+
+                FlowHttpClient flowHttpClient = new FlowHttpClient();
+
+                StringBuilder stringBuilder = new StringBuilder(PromptList.ArchitectureReview);
+                for (int i = 0; i < nodeList.Count; i++)
+                {
+                    stringBuilder.Append(nodeList[i]);
+                    if (i < nodeList.Count - 1) stringBuilder.Append(", ");
+                }
+
+                string prompt1 = stringBuilder.ToString();
+
+                // await flowHttpClient.PromptAsync(prompt1);
 
                 // Exportar para DGML
                 dgmlExporter.Export("method_graph.dgml");

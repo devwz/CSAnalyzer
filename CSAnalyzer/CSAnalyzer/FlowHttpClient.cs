@@ -1,20 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace CSAnalyzer
 {
+    public class FlowToken
+    {
+        [JsonPropertyName("access_token")]
+        public string AccessToken { get; set; }
+    }
+
     public class FlowHttpClient
     {
-        string flowToken;
-
-        public async Task GetFlowTokenAsync()
+        public async Task<string> GetFlowTokenAsync()
         {
             using (var httpClient = new HttpClient())
             {
@@ -24,28 +30,32 @@ namespace CSAnalyzer
                 {
                     clientId = "",
                     clientSecret = "",
-                    appToAccess = ""
+                    appToAccess = "llm-api"
                 };
 
                 var response = await PostAsync(httpClient, "", requestData);
-                flowToken = await response.Content.ReadAsStringAsync();
+                return await response.Content.ReadAsStringAsync();
             }
         }
 
-        public async Task PromptAsync()
+        public async Task PromptAsync(string prompt)
         {
+            string flowToken= await GetFlowTokenAsync();
+
+            /*
             if (!IsTokenValid(flowToken))
             {
                 await GetFlowTokenAsync();
             }
+            */
+
+            var token = JsonSerializer.Deserialize<FlowToken>(flowToken);
 
             using (var httpClient = new HttpClient())
             {
-                string token = "";
-
                 httpClient.DefaultRequestHeaders.Add("FlowTenant", "");
                 httpClient.DefaultRequestHeaders.Add("FlowAgent", "simple_agent");
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
 
                 var requestData = new
                 {
@@ -55,7 +65,7 @@ namespace CSAnalyzer
                         new
                         {
                             role = "user",
-                            content = "Hello, world!",
+                            content = prompt,
                         }
                     },
                     max_tokens = 3000,
@@ -64,6 +74,13 @@ namespace CSAnalyzer
 
                 var response = await PostAsync(httpClient, "", requestData);
                 var result = await response.Content.ReadAsStringAsync();
+                
+                var flowResult = JsonSerializer.Deserialize<FlowResult>(result);
+
+                using (StreamWriter outputFile = new StreamWriter("Flow ArchReview", false))
+                {
+                    outputFile.WriteLine(flowResult.Choices[0].Message.Content);
+                }
             }
         }
 

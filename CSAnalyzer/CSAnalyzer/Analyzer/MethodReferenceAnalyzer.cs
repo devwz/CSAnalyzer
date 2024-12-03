@@ -23,7 +23,7 @@ namespace CSAnalyzer.Analyzer
         /// <summary>
         /// Analisar referências de um método específico.
         /// </summary>
-        public void Analyze(SyntaxTree syntaxTree)
+        public void Analyze(SyntaxTree syntaxTree, List<string> nodeList)
         {
             var root = syntaxTree.GetRoot();
 
@@ -34,6 +34,8 @@ namespace CSAnalyzer.Analyzer
                 // string methodName = methodDeclaration.Identifier.Text;
                 var methodSymbol = (IMethodSymbol)_semanticModel.GetDeclaredSymbol(methodDeclaration);
                 string methodName = $"{methodSymbol.ContainingType}.{methodSymbol.Name}";
+
+                nodeList.Add(methodName + "()");
 
                 Console.WriteLine($"\n\nAnalyzing references for method '{methodName}':\n");
 
@@ -75,7 +77,8 @@ namespace CSAnalyzer.Analyzer
                     var isNativeLibrary = assemblyName == "mscorlib" ||
                           assemblyName == "System.Private.CoreLib" ||
                           assemblyName.StartsWith("System") ||
-                          assemblyName.StartsWith("Microsoft");
+                          assemblyName.StartsWith("Microsoft") ||
+                          assemblyName.StartsWith("Dapper");
 
                     if (!isNativeLibrary)
                     {
