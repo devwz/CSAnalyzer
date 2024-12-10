@@ -26,6 +26,7 @@ namespace CSAnalyzer
             {
                 httpClient.DefaultRequestHeaders.Add("FlowTenant", "");
 
+                // ToDo: Mover para arquivo de configuração
                 var requestData = new
                 {
                     clientId = "",
@@ -54,7 +55,7 @@ namespace CSAnalyzer
             using (var httpClient = new HttpClient())
             {
                 httpClient.DefaultRequestHeaders.Add("FlowTenant", "");
-                httpClient.DefaultRequestHeaders.Add("FlowAgent", "simple_agent");
+                httpClient.DefaultRequestHeaders.Add("FlowAgent", "simple_agent"); // ToDo: Alterar agent
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.AccessToken);
 
                 var requestData = new
@@ -77,7 +78,8 @@ namespace CSAnalyzer
                 
                 var flowResult = JsonSerializer.Deserialize<FlowResult>(result);
 
-                using (StreamWriter outputFile = new StreamWriter("Flow ArchReview", false))
+                // ToDo: Alterar local de salvamento
+                using (StreamWriter outputFile = new StreamWriter("Flow ArchReview.txt", false))
                 {
                     outputFile.WriteLine(flowResult.Choices[0].Message.Content);
                 }

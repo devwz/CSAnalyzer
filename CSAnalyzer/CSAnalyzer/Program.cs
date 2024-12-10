@@ -95,9 +95,10 @@ namespace CSAnalyzer
 
                 string prompt1 = stringBuilder.ToString();
 
-                // await flowHttpClient.PromptAsync(prompt1);
+                await flowHttpClient.PromptAsync(prompt1);
 
                 // Exportar para DGML
+                // ToDo: Alterar local do arquivo
                 dgmlExporter.Export("method_graph.dgml");
                 Console.WriteLine("\n\nDGML file exported: method_graph.dgml");
             }
